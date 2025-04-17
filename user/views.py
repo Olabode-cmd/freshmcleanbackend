@@ -121,7 +121,7 @@ class UserDetails(APIView):
 
     def get_object(self, pk):
         try:
-            return User.objects.get(pk=pk, is_deleted=False)  
+            return User.objects.get(id=pk, is_deleted=False)  
         except User.DoesNotExist:
             raise Http404
 
