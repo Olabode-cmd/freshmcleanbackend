@@ -2,7 +2,7 @@ from .base import *
 from datetime import timedelta
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['freshmcleanbackend.onrender.com']
 
 SECRET_KEY = 'django-insecure-8ptd_wui71kfya3b1fv)^rpdxxeji^o8hl^gv^&qs)2t6g+'
 
