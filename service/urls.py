@@ -2,6 +2,15 @@ from django.urls import path
 from .routes.coupon_route import CouponListCreateView, CouponRetrieveUpdateDestroyView
 from .routes.kyc_router import UserKYCProfileListCreateView, UserKYCProfileRetrieveUpdateDestroyView
 from .routes.apartment_route import ApartmentTypeListCreateView, ApartmentTypeRetrieveUpdateDestroyAPIViewView, ExtraSpaceViewListCreate, ExtraSpaceRetrieveUpdateDestroyAPIViewView
+from .routes.transaction_route import (
+    BookingPaymentListView,
+    BookingPaymentDetailView,
+    PayoutListView,
+    PayoutDetailView,
+)
+
+
+
 
 urlpatterns = [
     path('coupons/', CouponListCreateView.as_view(), name='create-list-coupon'),
@@ -19,4 +28,10 @@ urlpatterns = [
     path('user-cleaner-kyc/', UserKYCProfileListCreateView.as_view(), name='create-list-kyc'),
     path('user-cleaner-kyc/<uuid:id>/', UserKYCProfileRetrieveUpdateDestroyView.as_view(), name='retrieve-update-delete-kyc'),
 
+    #Transactions
+    path('booking-payments/', BookingPaymentListView.as_view(), name='booking-payment-list'),
+    path('booking-payments/<int:id>/', BookingPaymentDetailView.as_view(), name='booking-payment-detail'),
+
+    path('payouts/', PayoutListView.as_view(), name='payout-list'),
+    path('payouts/<int:id>/', PayoutDetailView.as_view(), name='payout-detail'),
 ]

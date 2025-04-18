@@ -1,0 +1,2 @@
+from rest_framework import serializers
+from service.models.booking_model import BookingDetail
