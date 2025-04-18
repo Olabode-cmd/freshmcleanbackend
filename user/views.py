@@ -3,10 +3,7 @@ from django.core.cache import cache
 from rest_framework.views import APIView
 from utils.response import ORJsonResponse
 from rest_framework import status
-from rest_framework.decorators import api_view
-from django.core.exceptions import ValidationError
 from .models import User
-from datetime import datetime
 from django.http import Http404
 from .permissions import IsAdmin
 from rest_framework import status
@@ -67,7 +64,7 @@ class RegisterUser(APIView):
         return ORJsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserList(APIView):
-    # permission_classes = [IsAdmin]
+    permission_classes = [IsAdmin]
     def get(self, request):
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
@@ -111,8 +108,7 @@ class LogoutUser(APIView):
             return ORJsonResponse({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserDetails(APIView):
-    # permission_classes = [IsAuthenticated, IsAdmin]
-
+    permission_classes = [IsAuthenticated]
     def get_object(self, pk):
         try:
             return User.objects.get(id=pk, is_deleted=False)  
@@ -189,8 +185,6 @@ class VerifyOTP(APIView):
             cache.set(f'otp_verified_{email}', True, timeout=300)
             return ORJsonResponse({'message': 'OTP verified successfully'}, status=status.HTTP_200_OK)
         return ORJsonResponse({'message': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
-
-
         
 class ResetPassword(APIView):
     def post(self, request):

@@ -24,12 +24,13 @@ class BookingDetail(BaseModel):
         WEEKLY = "WEEKLY", "WEEKLY"
         BI_WEEKLY = "BI_WEEKLY", "BI_WEEKLY"
         MONTHLY = "MONTHLY", "MONTHLY"
-    cleaner = models.ForeignKey(User, related_name='cleaner', on_delete=models.CASCADE)
-    client = models.ForeignKey(User, related_name='client', on_delete=models.CASCADE)
+    cleaner = models.ForeignKey(User, related_name='bookingdetail_cleanings', on_delete=models.CASCADE)
+    client = models.ForeignKey(User, related_name='bookingdetail_clients', on_delete=models.CASCADE)
+    
     apartment = models.ForeignKey(ApartmentType, on_delete=models.CASCADE)
     number_of_room = models.PositiveIntegerField(default=0)
     number_of_bath = models.PositiveIntegerField(default=0)
-    schedule = models.CharField(max_length=20, choices=SCHEDULE, default=SCHEDULE.ONE_OFF)
+    schedule = models.CharField(max_length=20, choices=SCHEDULE.choices, default=SCHEDULE.ONE_OFF)
     number_of_days = models.PositiveIntegerField(default=0)
     selected_days = models.CharField(max_length=20, choices=WEEKDAYS)
     extra_spaces = models.ManyToManyField(ExtraSpace, blank=True)
@@ -43,7 +44,7 @@ class BookingDetail(BaseModel):
     week_type = models.IntegerField(choices=[(1, "Week 1"), (2, "Week 2"),(3, "Week 3"), (4, "Week 4")], null=True, blank=True)
     day_of_month = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1),  MaxValueValidator(31)])
     weekdays = models.CharField(max_length=12, choices=WEEKDAYS, null=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_CHOICES.NOT_STARTED)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES.choices, default=STATUS_CHOICES.NOT_STARTED)
     payment_statement = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):

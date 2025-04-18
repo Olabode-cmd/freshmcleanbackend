@@ -17,11 +17,12 @@ class KYCDoucment(BaseModel):
 
 class UserKYCProfile(BaseModel):
     class STATUS(models.TextChoices):
-        PENDING = "PENDING", "PENDING"
-        SUCCESSFUL = "SUCCESSFUL", "SUCCESSFUL"
-        FAILED = "FAILED", "FAILED"
-    user = models.ForeignKey(User, on_delete=models.CASCADE, unique=True)
-    document = models.ForeignKey(KYCDoucment, on_delete=models.CASCADE, unique=True)
-    status = models.CharField(max_length=15, choices=STATUS, default=STATUS.PENDING, blank=True)
+        PENDING = 'pending', 'Pending'
+        APPROVED = 'approved', 'Approved'
+        DECLINED = 'declined', 'Declined'
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    document = models.ForeignKey(KYCDoucment, on_delete=models.CASCADE)
+    status = models.CharField(max_length=15, choices=STATUS.choices, default=STATUS.PENDING, blank=True)
 
 

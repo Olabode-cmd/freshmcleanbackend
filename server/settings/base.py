@@ -20,11 +20,10 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     "drf_yasg",
     "rest_framework",
-    "corsheaders",
-    "adrf",
-    
+    "corsheaders",    
     # apps
     'user',
+    'service',
 
 ]
 
