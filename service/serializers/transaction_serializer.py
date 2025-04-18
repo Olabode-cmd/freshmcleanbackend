@@ -8,7 +8,7 @@ class BookingPaymentSerializer(serializers.ModelSerializer):
     booking_id = serializers.SlugRelatedField(slug_field="id", queryset=BookingDetail.objects.all())
     class Meta:
         model = BookingPayment
-        fields = ['id', 'booking_id', 'cleaner', 'client', 'amount', 'promo_code', 'discounted', 'transation_id', 'status' 'created_at', 'updated_at']
+        fields = ['id', 'booking_id', 'cleaner', 'client', 'amount', 'promo_code', 'discounted', 'transation_id', 'status', 'created_at', 'updated_at']
         extra_kwargs = {
             'id': {'read_only': True},
             'booking_id': {'read_only': True},
@@ -32,7 +32,7 @@ class PayoutSerializer(serializers.ModelSerializer):
     booking_id = serializers.SlugRelatedField(slug_field="id", queryset=BookingDetail.objects.all())
     class Meta:
         model = Payout
-        fields = ['id', 'booking_id', 'cleaner', 'amount',  'transation_id', 'status' 'created_at', 'updated_at']
+        fields = ['id', 'booking_id', 'cleaner', 'amount',  'transation_id', 'status', 'created_at', 'updated_at']
         extra_kwargs = {
             'id': {'read_only': True},
             'booking_id': {'read_only': True},
