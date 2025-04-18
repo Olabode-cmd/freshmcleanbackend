@@ -1,7 +1,7 @@
 import random
 from django.core.cache import cache
 from rest_framework.views import APIView
-from server.utils import ORJsonResponse
+from utils.response import ORJsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from django.core.exceptions import ValidationError
@@ -49,7 +49,6 @@ def send_otp_email(request, email):
 class RegisterUser(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
-
         serializer = SignUpSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -62,14 +61,13 @@ class RegisterUser(APIView):
                     "id": str(user.id),
                     "email": user.email,
                     "username": user.username,
-                    "role": user.role
                 },
                 status=status.HTTP_201_CREATED,
             )
         return ORJsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserList(APIView):
-    permission_classes = [IsAdmin]
+    # permission_classes = [IsAdmin]
     def get(self, request):
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
@@ -92,7 +90,6 @@ class LoginUser(APIView):
                     "access": str(refresh.access_token),
                     "id": user.id,
                     "email": user.email,
-                    "role": user.role,
                     "username": user.username,
                 },
                 status=status.HTTP_200_OK,
@@ -113,11 +110,8 @@ class LogoutUser(APIView):
         except Exception as e:
             return ORJsonResponse({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-
 class UserDetails(APIView):
-    permission_classes = [IsAuthenticated, IsAdmin]
+    # permission_classes = [IsAuthenticated, IsAdmin]
 
     def get_object(self, pk):
         try:
@@ -130,13 +124,14 @@ class UserDetails(APIView):
         serializer = UserSerializer(user)
         return ORJsonResponse(serializer.data)
 
-    def put(self, request, pk, format=None):
-        user = self.get_object(pk)
-        serializer = UserSerializer(user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return ORJsonResponse(serializer.data)
-        return ORJsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def patch(self, request, pk, format=None):
+        user = self.get_object(pk)  
+        serializer = UserSerializer(user, data=request.data, partial=True)  
+        
+        if serializer.is_valid():  
+            serializer.save() 
+            return ORJsonResponse(serializer.data, status=status.HTTP_200_OK)
+        
 
     def delete(self, request, pk, format=None):
         user = self.get_object(pk)
@@ -148,7 +143,7 @@ class UserDetails(APIView):
         user = self.get_object(pk)
         user.is_deleted = True
         user.save()
-        return ORJsonResponse(status=status.HTTP_204_NO_CONTENT)
+        return ORJsonResponse({"message": "User moved to trash"}, status=status.HTTP_204_NO_CONTENT)
 
 
 class RequestPasswordReset(APIView):

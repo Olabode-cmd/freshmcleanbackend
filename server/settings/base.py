@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "rest_framework",
     "corsheaders",
+    "adrf",
     
     # apps
     'user',

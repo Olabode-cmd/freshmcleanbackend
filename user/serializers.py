@@ -9,7 +9,6 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "email",
-            "role",
             "username",
             "password",
             "created_at",
@@ -23,7 +22,7 @@ class SignUpSerializer(serializers.ModelSerializer):
             "email",
             "username",
             "password",
-            "role",
+            # "is_superuser",
             "created_at",
         ]
         extra_kwargs = {

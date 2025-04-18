@@ -1,5 +1,5 @@
 from rest_framework import generics
-from models.coupon import Coupon
+from service.models.coupon_model import Coupon
 from serializers.couponserializer import CouponSerializer
 
 class CouponListCreateView(generics.ListCreateAPIView):

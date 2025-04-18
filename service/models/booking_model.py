@@ -1,6 +1,7 @@
-from django.db import models
-from .base import BaseModel, ExtraSpace, ApartmentType
 from user.models import User
+from django.db import models
+from utils.base_model import BaseModel
+from .apartment_model import ApartmentType, ExtraSpace
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 WEEKDAYS = [
@@ -13,57 +14,47 @@ WEEKDAYS = [
     ('SUN', 'SUNDAY')
 ]
 
-class Booking(BaseModel):
+class BookingDetail(BaseModel):
     class STATUS_CHOICES(models.TextChoices):
         NOT_STARTED = "NOT STARTED", "NOT STARTED"
         IN_PROGRESS = "IN PROGRESS", "IN PROGRESS"
         COMPLETED =  "COMPLETED", "COMPLETED"
     class SCHEDULE(models.TextChoices):
-        ON_OFF = "ON-OFF", "ON-OFF"
+        ONE_OFF = "ONE_OFF", "ONE_OFF"
         WEEKLY = "WEEKLY", "WEEKLY"
-        BI_WEEKLY = "BI-WEEKLY", "BI-WEEKLY"
+        BI_WEEKLY = "BI_WEEKLY", "BI_WEEKLY"
         MONTHLY = "MONTHLY", "MONTHLY"
-    cleaner = models.ForeignKey(User, related_name='cleanings', on_delete=models.CASCADE)
-    client = models.ForeignKey(User, related_name='bookings', on_delete=models.CASCADE)
+    cleaner = models.ForeignKey(User, related_name='cleaner', on_delete=models.CASCADE)
+    client = models.ForeignKey(User, related_name='client', on_delete=models.CASCADE)
     apartment = models.ForeignKey(ApartmentType, on_delete=models.CASCADE)
     number_of_room = models.PositiveIntegerField(default=0)
     number_of_bath = models.PositiveIntegerField(default=0)
-    schedule = models.CharField(max_length=20, choices=SCHEDULE, default=SCHEDULE.ON_OFF)
+    schedule = models.CharField(max_length=20, choices=SCHEDULE, default=SCHEDULE.ONE_OFF)
     number_of_days = models.PositiveIntegerField(default=0)
     selected_days = models.CharField(max_length=20, choices=WEEKDAYS)
     extra_spaces = models.ManyToManyField(ExtraSpace, blank=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    number_of_extras = models.PositiveIntegerField(default=0, null=True)
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     cleaning_location = models.TextField()
-    extra_spaces = models.ManyToManyField(ExtraSpace, blank=True)
-    number_of_extras = models.PositiveIntegerField(default=0, null=True)
+    week_type = models.IntegerField(choices=[(1, "Week 1"), (2, "Week 2"),(3, "Week 3"), (4, "Week 4")], null=True, blank=True)
+    day_of_month = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1),  MaxValueValidator(31)])
     weekdays = models.CharField(max_length=12, choices=WEEKDAYS, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_CHOICES.NOT_STARTED)
-    week_type = models.IntegerField(choices=[(1, "Week 1"), (2, "Week 2"),(2, "Week 2"), (2, "Week 2")], null=True, blank=True)
-    day_of_month = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1),  MaxValueValidator(31)])
+    payment_statement = models.BooleanField(default=False)
 
-
-    def calculate_price(self):
-        apartment_price = self.apartment.price
-        room_diff = max(0, self.number_of_room - self.apartment.number_of_room)
-        bath_diff = max(0, self.number_of_bath - self.apartment.number_of_bathroom)
-
-
-        extra_room_price = room_diff * 13
-        extra_bath_price = bath_diff * 7
-
+    def save(self, *args, **kwargs):
         extras_total = 0
         if self.extra_spaces.exists():
             for extra in self.extra_spaces.all():
                 extras_total += extra.price * (self.number_of_extras or 1)
 
-
-        days_count = 1  
+        days_count = 1
         if self.schedule == self.SCHEDULE.WEEKLY and self.selected_days:
-            days_count = len(self.selected_days.split(',')) 
+            days_count = len(self.selected_days.split(','))
         elif self.schedule == self.SCHEDULE.BI_WEEKLY and self.selected_days:
             days_count = len(self.selected_days.split(',')) * 2
         elif self.schedule == self.SCHEDULE.MONTHLY and self.selected_days:
@@ -71,49 +62,13 @@ class Booking(BaseModel):
 
         self.number_of_days = days_count
 
-        total_price = (apartment_price + extra_room_price + extra_bath_price + extras_total) * days_count
-        return total_price
+        if self.number_of_room and self.number_of_bath:
+            base_price = self.number_of_days * (
+                self.apartment.price + (self.number_of_room * 13) + (self.number_of_bath * 13)
+            )
+            self.price = base_price + extras_total
 
-    def save(self, *args, **kwargs):
-        self.price = self.calculate_price()
         super().save(*args, **kwargs)
-  
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-
-    
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if self.pk:
-            self.price += sum(space.price for space in self.extra_spaces.all())
-            super().save(update_fields=['price'])
 
     def __str__(self):
-        return f"{self.client.username} booking with {self.cleaner.username} - {self.status}"
+        return self.client.username

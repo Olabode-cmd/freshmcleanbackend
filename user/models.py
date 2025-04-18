@@ -1,6 +1,5 @@
-import uuid
 from django.db import models
-from .base import BaseModel
+from utils.base_model import BaseModel
 from django.core.exceptions import ValidationError
 from django.contrib.auth import password_validation
 from django.contrib.auth.base_user import BaseUserManager
@@ -8,7 +7,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
 
 class AppUserManager(BaseUserManager):
-    def create_user(self, id, email, phone_number, username, role, password=None):
+    def create_user(self, id, email, phone_number, username, password=None):
         if not password:
             raise ValueError("Password is required")
 
@@ -16,7 +15,6 @@ class AppUserManager(BaseUserManager):
             id=id,
             email=self.normalize_email(email),
             phone_number=phone_number,
-            role=role,
             username=username,
         )
         try:
@@ -34,7 +32,7 @@ class AppUserManager(BaseUserManager):
             email=email,
             phone_number="N/A", 
             username=username,
-            role="ADMIN",
+            is_superuser=True,
             password=password,
         )
         if error:
@@ -47,20 +45,11 @@ class AppUserManager(BaseUserManager):
     def get_queryset(self):
         return super().get_queryset().filter(is_deleted=False)
 
-class User(AbstractBaseUser, PermissionsMixin, BaseModel):
-    class ROLE(models.TextChoices):
-        ADMIN = "ADMIN", "Admin"
-        USER = "USER", "User"
-        CLEANER = "CLEANER", "Cleaner"
-
-    role = models.CharField(max_length=20, choices=ROLE.choices, null=True, default=ROLE.USER)
+class User(BaseModel, AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
-    first_name = models.CharField(max_length=25, null=True, default="")
-    last_name = models.CharField(max_length=25, null=True, default="")
-    other_name = models.CharField(max_length=25, null=True, default="")
     phone_number = models.CharField(max_length=15, unique=True)
     username = models.CharField(max_length=20, unique=True)
-    is_staff = models.BooleanField(default=False)
+    is_cleaner = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_verified = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)

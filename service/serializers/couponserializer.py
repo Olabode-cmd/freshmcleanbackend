@@ -1,6 +1,6 @@
 # in your app's serializers.py
 from rest_framework import serializers
-from models.coupon import Coupon
+from service.models.coupon_model import Coupon
 
 class CouponSerializer(serializers.ModelSerializer):
     class Meta:

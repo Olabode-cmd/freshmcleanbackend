@@ -2,7 +2,7 @@ from .base import *
 from datetime import timedelta
 
 
-ALLOWED_HOSTS = ['freshmcleanbackend.onrender.com']
+ALLOWED_HOSTS = ['*']
 
 SECRET_KEY = 'django-insecure-8ptd_wui71kfya3b1fv)^rpdxxeji^o8hl^gv^&qs)2t6g+'
 
@@ -27,13 +27,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-STATIC_URL = "/static/"
-STATICFILES_DIRS = ["static"]
-STATIC_ROOT = "staticfiles"
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join("media")
 
 TIME_ZONE = 'Africa/Lagos'
 

@@ -31,13 +31,6 @@ DATABASES = {
     }
 }
 
-STATIC_URL = "/static/"
-STATICFILES_DIRS = ["static"]
-STATIC_ROOT = "staticfiles"
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join("media")
-
 TIME_ZONE = 'Europe/Berlin'
 
 

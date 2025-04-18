@@ -15,5 +15,3 @@ class ORJsonResponse(HttpResponse):
 class AsyncView(View):
     async def get(self, request):
         return ORJsonResponse({"message": "Hello from async!"})
-
-
