@@ -28,7 +28,6 @@ class GoogleLoginView(APIView):
             email=email,
             defaults={
                 "username": name,
-                "role": User.ROLE.USER,
                 "phone_number": "",
             },
         )
@@ -39,5 +38,5 @@ class GoogleLoginView(APIView):
         return Response({
             "access_token": str(refresh.access_token),
             "refresh_token": str(refresh),
-            "user": {"email": user.email, "name": user.username, "role": user.role}
+            "user": {"email": user.email, "name": user.username}
         })
